@@ -15,32 +15,15 @@ def get_start_key(problem_num):
     auth_key=auth_json.get("auth_key")
     return auth_key
 
-def waitingline_api(auth_key):
+def get_api(auth_key,url):
     headers={"Authorization":auth_key,"Content-Type":"application/json"}
 
-    waitingline_response=requests.get(base_url+"/waiting_line",headers=headers)
-    waitingline_data=waitingline_response.json()
-    waitingline_json=json.loads(json.dumps(waitingline_data)).get("waiting_line")
+    response=requests.get(base_url+url,headers=headers)
+    data=response.json()
+    response_json=json.loads(json.dumps(data))
 
-    return waitingline_json
+    return response_json
 
-def gameresult_api(auth_key):
-    headers={"Authorization":auth_key,"Content-Type":"application/json"}
-
-    gameresult_response=requests.get(base_url+"/game_result",headers=headers)
-    gameresult_data=gameresult_response.json()
-    gameresult_json=json.loads(json.dumps(gameresult_data))
-
-    return gameresult_json
-
-def userinfo_api(auth_key):
-    headers={"Authorization":auth_key,"Content-Type":"application/json"}
-
-    userinfo_response=requests.get(base_url+"/user_info",headers=headers)
-    userinfo_data=userinfo_response.json()
-    userinfo_json=json.loads(json.dumps(userinfo_data))
-
-    return userinfo_json
 
 def match_api(auth_key,match_data):
     headers={"Authorization":auth_key,"Content-Type":"application/json"}
@@ -62,15 +45,6 @@ def changegrade_api(auth_key,grade_data):
     changegrade_json=json.loads(json.dumps(changegrade_data))
 
     return changegrade_json
-
-def score_api(auth_key):
-    headers={"Authorization":auth_key,"Content-Type":"application/json"}
-
-    score_response=requests.get(base_url+"/score",headers=headers)
-    score_data=score_response.json()
-    score_json=json.loads(json.dumps(score_data))
-
-    return score_json
 
 def calculate_diff_by_time(time):
     return 445*(43-time)//35
@@ -100,12 +74,11 @@ for i in range(0,596):
     match_needed_group={}
     waiting_dict={}
 
-    waitingline_info=waitingline_api(problem1_auth_key)
+    waitingline_info=get_api(problem1_auth_key,"/waiting_line").get("waiting_line")
     for w in waitingline_info:
         waiting_dict[w.get('id')]=w.get('from')
-
     
-    gameresult_info=gameresult_api(problem1_auth_key).get("game_result")
+    gameresult_info=get_api(problem1_auth_key,"/game_result").get("game_result")
 
     for result in gameresult_info:
         diff=calculate_diff_by_time(int(result.get("taken")))
@@ -138,5 +111,5 @@ for i in range(0,596):
 
     changegrade_api(problem1_auth_key,make_to_json_object(user_dict))
 
-userinfo=userinfo_api(problem1_auth_key)
-score=score_api(problem1_auth_key)
+userinfo=get_api(problem1_auth_key,"/user_info")
+score=get_api(problem1_auth_key,"/score")
